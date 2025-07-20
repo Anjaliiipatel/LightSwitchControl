@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Light Control</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', monospace;
+            background: radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animated background particles */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: float 10s infinite linear;
+            opacity: 0.3;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-10px) rotate(360deg); opacity: 0; }
+        }
+        
+        .control-panel {
+            background: linear-gradient(145deg, rgba(15, 15, 15, 0.95), rgba(25, 25, 25, 0.95));
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 
+                0 0 40px rgba(0, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 10;
+            min-width: 350px;
+            transition: all 0.3s ease;
+        }
+        
+        .control-panel:hover {
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 
+                0 0 60px rgba(0, 255, 255, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+        }
+        
+        .panel-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .system-title {
+            color: #ffffff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        
+        .system-status {
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+        
+        /* Main Power Switch */
+        .power-section {
+            margin-bottom: 35px;
+        }
+        
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .power-switch {
+            position: relative;
+            width: 140px;
+            height: 70px;
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border-radius: 35px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                inset 0 2px 8px rgba(0, 0, 0, 0.8),
+                inset 0 -2px 8px rgba(255, 255, 255, 0.05);
+        }
+        
+        .power-switch.active {
+            background: linear-gradient(145deg, #0a4a4a, #1a6a6a);
+            border-color: #00ffff;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.4),
+                inset 0 2px 8px rgba(0, 0, 0, 0.3),
+                inset 0 -2px 8px rgba(0, 255, 255, 0.2);
+        }
+        
+        .switch-handle {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #333, #555);
+            border-radius: 50%;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .switch-handle::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: #ff4444;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(255, 68, 68, 0.6);
+        }
+        
+        .power-switch.active .switch-handle {
+            transform: translateX(70px);
+            background: linear-gradient(145deg, #00ffff, #40ffff);
+            box-shadow: 
+                0 4px 12px rgba(0, 255, 255, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        .power-switch.active .switch-handle::before {
+            background: #00ff00;
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.8);
+        }
+        
+        /* Control Sliders */
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #aaa;
+            font-size: 0.9rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .control-value {
+            color: #00ffff;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+        
+        .slider-container {
+            position: relative;
+            height: 8px;
+            background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
+            border-radius: 4px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            overflow: hidden;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: transparent;
+            outline: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #00ffff, #40ffff);
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 
+                0 0 12px rgba(0, 255, 255, 0.6),
+                0 2px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #00ffff, #40ffff);
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 
+                0 0 12px rgba(0, 255, 255, 0.6),
+                0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .slider-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #40ffff);
+            border-radius: 4px;
+            transition: width 0.2s ease;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+        }
+        
+        /* Status Indicators */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .status-item {
+            background: linear-gradient(145deg, rgba(15, 15, 15, 0.8), rgba(25, 25, 25, 0.8));
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .status-item:hover {
+            border-color: rgba(0, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .status-label {
+            color: #888;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            color: #00ffff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Disabled state */
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .control-panel {
+                margin: 20px;
+                padding: 30px 25px;
+                min-width: auto;
+            }
+            
+            .power-switch {
+                width: 120px;
+                height: 60px;
+            }
+            
+            .switch-handle {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .power-switch.active .switch-handle {
+                transform: translateX(60px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <div class="panel-header">
+            <h1 class="system-title">Neural Light Control</h1>
+            <p class="system-status">System Status: <span id="systemStatus">STANDBY</span></p>
+        </div>
+        
+        <div class="power-section">
+            <div class="switch-container">
+                <div class="power-switch" id="powerSwitch">
+                    <div class="switch-handle"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-section" id="controlsSection">
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Intensity</span>
+                    <span class="control-value" id="intensityValue">75%</span>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-fill" id="intensityFill"></div>
+                    <input type="range" min="0" max="100" value="75" class="slider" id="intensitySlider">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Frequency</span>
+                    <span class="control-value" id="frequencyValue">2847.5 Hz</span>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-fill" id="frequencyFill"></div>
+                    <input type="range" min="2000" max="3000" value="2847.5" step="0.1" class="slider" id="frequencySlider">
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="status-label">Power Draw</div>
+                <div class="status-value" id="powerDraw">0W</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Efficiency</div>
+                <div class="status-value" id="efficiency">--</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Temperature</div>
+                <div class="status-value" id="temperature">22°C</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Runtime</div>
+                <div class="status-value" id="runtime">00:00:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class FuturisticLightControl {
+            constructor() {
+                this.isPowered = false;
+                this.intensity = 75;
+                this.frequency = 2847.5;
+                this.particles = [];
+                this.runtime = 0;
+                this.runtimeInterval = null;
+                
+                // DOM elements
+                this.powerSwitch = document.getElementById('powerSwitch');
+                this.controlsSection = document.getElementById('controlsSection');
+                this.systemStatus = document.getElementById('systemStatus');
+                this.intensitySlider = document.getElementById('intensitySlider');
+                this.frequencySlider = document.getElementById('frequencySlider');
+                this.intensityValue = document.getElementById('intensityValue');
+                this.frequencyValue = document.getElementById('frequencyValue');
+                this.intensityFill = document.getElementById('intensityFill');
+                this.frequencyFill = document.getElementById('frequencyFill');
+                this.powerDraw = document.getElementById('powerDraw');
+                this.efficiency = document.getElementById('efficiency');
+                this.temperature = document.getElementById('temperature');
+                this.runtimeDisplay = document.getElementById('runtime');
+                
+                this.init();
+            }
+            
+            init() {
+                this.createParticles();
+                this.bindEvents();
+                this.updateDisplay();
+                this.updateSliderFills();
+                this.controlsSection.classList.add('disabled');
+            }
+            
+            createParticles() {
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        particle.style.left = Math.random() * 100 + '%';
+                        particle.style.animationDelay = Math.random() * 10 + 's';
+                        particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+                        document.body.appendChild(particle);
+                        
+                        // Remove particle after animation
+                        setTimeout(() => {
+                            if (particle.parentNode) {
+                                particle.parentNode.removeChild(particle);
+                            }
+                        }, 12000);
+                    }, i * 200);
+                }
+                
+                // Continuously create new particles
+                setInterval(() => {
+                    this.createParticles();
+                }, 12000);
+            }
+            
+            bindEvents() {
+                this.powerSwitch.addEventListener('click', () => {
+                    this.togglePower();
+                });
+                
+                this.intensitySlider.addEventListener('input', (e) => {
+                    this.intensity = parseInt(e.target.value);
+                    this.updateDisplay();
+                    this.updateSliderFills();
+                });
+                
+                this.frequencySlider.addEventListener('input', (e) => {
+                    this.frequency = parseFloat(e.target.value);
+                    this.updateDisplay();
+                    this.updateSliderFills();
+                });
+                
+                // Add hover effects for enhanced interactivity
+                this.powerSwitch.addEventListener('mouseenter', () => {
+                    if (!this.isPowered) {
+                        this.powerSwitch.style.borderColor = 'rgba(0, 255, 255, 0.6)';
+                    }
+                });
+                
+                this.powerSwitch.addEventListener('mouseleave', () => {
+                    if (!this.isPowered) {
+                        this.powerSwitch.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                    }
+                });
+            }
+            
+            togglePower() {
+                this.isPowered = !this.isPowered;
+                
+                if (this.isPowered) {
+                    this.powerOn();
+                } else {
+                    this.powerOff();
+                }
+                
+                this.updateDisplay();
+                this.animatePowerTransition();
+            }
+            
+            powerOn() {
+                this.powerSwitch.classList.add('active');
+                this.controlsSection.classList.remove('disabled');
+                this.systemStatus.textContent = 'ACTIVE';
+                this.systemStatus.classList.add('pulse');
+                
+                // Start runtime counter
+                this.runtime = 0;
+                this.runtimeInterval = setInterval(() => {
+                    this.runtime++;
+                    this.updateRuntime();
+                }, 1000);
+                
+                // Simulate power draw and temperature changes
+                this.simulateSystemChanges();
+            }
+            
+            powerOff() {
+                this.powerSwitch.classList.remove('active');
+                this.controlsSection.classList.add('disabled');
+                this.systemStatus.textContent = 'STANDBY';
+                this.systemStatus.classList.remove('pulse');
+                
+                // Stop runtime counter
+                if (this.runtimeInterval) {
+                    clearInterval(this.runtimeInterval);
+                    this.runtimeInterval = null;
+                }
+                
+                this.runtime = 0;
+                this.updateRuntime();
+            }
+            
+            animatePowerTransition() {
+                // Add visual feedback during power transition
+                document.body.style.transition = 'background 0.5s ease';
+                
+                if (this.isPowered) {
+                    // Slight blue tint when powered on
+                    document.body.style.background = 'radial-gradient(ellipse at center, #0a0a1a 0%, #000010 100%)';
+                } else {
+                    // Return to original background
+                    document.body.style.background = 'radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%)';
+                }
+            }
+            
+            simulateSystemChanges() {
+                if (!this.isPowered) return;
+                
+                // Simulate temperature fluctuations
+                const baseTemp = 22;
+                const tempVariation = (this.intensity / 100) * 15;
+                const currentTemp = baseTemp + tempVariation + (Math.random() - 0.5) * 2;
+                this.temperature.textContent = currentTemp.toFixed(1) + '°C';
+                
+                // Update again after a delay
+                setTimeout(() => {
+                    if (this.isPowered) {
+                        this.simulateSystemChanges();
+                    }
+                }, 2000 + Math.random() * 3000);
+            }
+            
+            updateDisplay() {
+                // Update intensity display
+                this.intensityValue.textContent = this.intensity + '%';
+                
+                // Update frequency display
+                this.frequencyValue.textContent = this.frequency.toFixed(1) + ' Hz';
+                
+                // Calculate and update power draw
+                if (this.isPowered) {
+                    const powerDraw = Math.round((this.intensity / 100) * 85 + 15);
+                    this.powerDraw.textContent = powerDraw + 'W';
+                    
+                    // Calculate efficiency
+                    const efficiency = Math.round(88 + (Math.random() - 0.5) * 6);
+                    this.efficiency.textContent = efficiency + '%';
+                } else {
+                    this.powerDraw.textContent = '0W';
+                    this.efficiency.textContent = '--';
+                }
+            }
+            
+            updateSliderFills() {
+                // Update intensity fill
+                this.intensityFill.style.width = this.intensity + '%';
+                
+                // Update frequency fill (normalize to 0-100%)
+                const freqPercent = ((this.frequency - 2000) / 1000) * 100;
+                this.frequencyFill.style.width = freqPercent + '%';
+            }
+            
+            updateRuntime() {
+                const hours = Math.floor(this.runtime / 3600);
+                const minutes = Math.floor((this.runtime % 3600) / 60);
+                const seconds = this.runtime % 60;
+                
+                const timeString = 
+                    String(hours).padStart(2, '0') + ':' +
+                    String(minutes).padStart(2, '0') + ':' +
+                    String(seconds).padStart(2, '0');
+                
+                this.runtimeDisplay.textContent = timeString;
+            }
+        }
+        
+        // Initialize the control system
+        document.addEventListener('DOMContentLoaded', () => {
+            new FuturisticLightControl();
+        });
+    </script>
+</body>
+</html>
